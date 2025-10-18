@@ -1,0 +1,157 @@
+---
+title: "2025 Seattle general election ballot return statistics"
+---
+
+Map of absolute turnout and turnout relative to projected turnout through DATE WILL GO HERE. 
+
+Right now data uses the primary election as a placeholder. Beginning two weeks from election day, this can get updated daily with live data. Importantly, some of th areas of lowest primary turnout (e.g., Rainier Valley) also exceeded expectations (relative to expected general election turnout) more than any other area. Model-based predictions of turnout may struggle to capture the current (national) political environment and a more energized voting population. Primary turnout may be a useful metric to compare to, in additional to model-based predictions.
+```{r, message = FALSE}
+#| label: data-prep
+
+library(here)
+library(dplyr)
+library(ggplot2)
+library(sf)
+
+i_am('website/index.qmd')
+today <- Sys.Date()
+
+# Read in actual returns (for now is a dummy from primary)
+# Suppresses a warning
+# I think it is because the Party column has zero entries
+obs_returns <- readr::read_csv(
+  'https://www.sos.wa.gov/sites/default/files/past_elections/2025-08/King.csv',
+  col_types = 'cicccccccccccicdccc',
+  col_select = -Party
+) |>
+  rename_all(
+    ~ stringr::str_replace(
+      stringr::str_to_lower(.),
+      pattern = ' ',
+      replacement = '_'
+    )
+  ) |>
+  filter(stringr::str_detect(precinct, 'SEA')) |>
+  mutate(
+    received_date = lubridate::mdy_hms(received_date), # time stamp doesn't work, oh well.
+  )
+
+# Read predicted returns
+predicted_returns <- readr::read_csv(here(
+  'data/turnout_propensity_10_02_2025.csv'
+))
+
+# Read in voter database mainly to get age and when they last voted
+voter_database <- readr::read_csv(here('data/voter_database_summary.csv'))
+
+# Read in precinct-level demographics
+demographics <- sf::st_read(
+  here(
+    'data/precinct_demographics_09_04_2025.gpkg'
+  ),
+  quiet = TRUE
+) |>
+  rename_all(
+    ~ stringr::str_replace(
+      stringr::str_to_lower(.),
+      pattern = ' ',
+      replacement = '_'
+    )
+  ) |>
+  filter(stringr::str_detect(name, 'SEA')) |>
+  mutate(precinct_code = stringr::str_extract(name, '(?<=-)[:digit:]+'))
+
+# Join data frames for voter level return data
+voter_returns <- predicted_returns |>
+  select(voter_id, p_turnout_raw, turnout_flag_raw, precinct4) |>
+  left_join(
+    select(obs_returns, -c(county:election, address:country))
+  ) |>
+  left_join(voter_database) |>
+  mutate(
+    voter_id = as.integer(voter_id),
+    birth_year = as.integer(birth_year),
+    age = as.integer(2025 - birth_year)
+  )
+
+# Summarize to precinct level, then join with demographic data
+precinct_returns_tmp <- voter_returns |>
+  group_by(precinct4) |>
+  summarise(
+    obs_turnout = sum(ballot_status == 'Accepted', na.rm = TRUE) / n(),
+    exp_turnout = mean(p_turnout_raw, na.rm = TRUE),
+    avg_age = mean(age, na.rm = TRUE),
+    # there are some voters not in my voter database that are in the predicted turnout
+    avg_age_voted = sum(age * (ballot_status == 'Accepted'), na.rm = TRUE) /
+      sum(ballot_status == 'Accepted', na.rm = TRUE)
+  ) |>
+  mutate(resid_turnout = obs_turnout - exp_turnout)
+
+# there are some precincts in predicted turnout that don't show up in demographics
+# also some precincts in demographics that seem to not be in Seattle
+# therefore, useing inner_join
+precinct_returns <- inner_join(
+  demographics,
+  precinct_returns_tmp,
+  by = c(precinct_code = 'precinct4')
+)
+
+```
+
+
+```{r}
+#| label: turnout-map
+theme_set(theme_bw())
+
+obs_turnout <- ggplot(precinct_returns) +
+  geom_sf(aes(fill = obs_turnout)) +
+  viridis::scale_fill_viridis(option = 'mako') +
+  labs(fill = 'Turnout') +
+  theme(legend.position = 'top')
+
+resid_turnout <- ggplot(precinct_returns) +
+  geom_sf(aes(fill = resid_turnout)) +
+  viridis::scale_fill_viridis(option = 'mako') +
+  labs(fill = 'Obs. - Exp. Turnout') +
+  theme(legend.position = 'top')
+
+cowplot::plot_grid(obs_turnout, resid_turnout, align = 'v')
+```
+
+## Top ten precincts with higher than expected turnout:
+```{r}
+precinct_returns |>
+  as.data.frame() |>
+  as_tibble() |>
+  arrange(desc(resid_turnout)) |>
+  select(
+    Precinct = name,
+    Turnout = obs_turnout,
+    `Obs - Exp Turnout` = resid_turnout
+  ) |>
+  slice(1:10) |>
+  knitr::kable(digits = 2) |>
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+## Top ten precincts with lower than expected turnout:
+```{r}
+precinct_returns |>
+  as.data.frame() |>
+  as_tibble() |>
+  arrange(resid_turnout) |>
+  select(
+    Precinct = name,
+    Turnout = obs_turnout,
+    `Obs - Exp Turnout` = resid_turnout
+  ) |>
+  slice(1:10) |>
+  knitr::kable(digits = 2) |>
+  kableExtra::kable_styling(full_width = FALSE)
+```
+
+## Other options
+
+Precinct-level turnout can be examined relative to projected turnout, primary turnout, and many demographic characteristics. Demographic characteristics include average age, racial makeup, educational attainment, dominant commute mode, owner vs renter occupied, average income, average home values, and dominant languages. 
+
+Voter-level data (i.e., whether an individual ballot has been returned) can be examined relative to projected turnout likelihood, recent voting history (e.g., primary), age, and gender.

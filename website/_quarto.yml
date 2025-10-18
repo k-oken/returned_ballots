@@ -1,0 +1,25 @@
+project:
+  type: website
+  output-dir: ../docs
+
+website:
+  title: "Ballot return statistics"
+  navbar:
+    background: primary
+    left:
+      - href: index.qmd
+        text: Home
+      - about.qmd
+
+format:
+  html:
+    theme: luxmen
+    css: styles.css
+    toc: true
+
+execute:
+    echo: false
+    message: false
+    warning: false
+
+
