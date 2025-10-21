@@ -48,5 +48,8 @@ rsconnect/
 # quarto folder
 /.quarto/
 
+# site folder
+/_site/
+
 # voter data (confidential)
 data/20251001_VRDB_Extract.txt
