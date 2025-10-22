@@ -1,0 +1,44 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Other tabs?",
+    "section": "",
+    "text": "Additional tabs could go here."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "2025 Seattle general election ballot return statistics",
+    "section": "",
+    "text": "Map of absolute turnout and turnout relative to projected turnout through 2025-10-21."
+  },
+  {
+    "objectID": "index.html#top-ten-precincts-with-higher-than-expected-turnout",
+    "href": "index.html#top-ten-precincts-with-higher-than-expected-turnout",
+    "title": "2025 Seattle general election ballot return statistics",
+    "section": "Top ten precincts with higher than expected turnout:",
+    "text": "Top ten precincts with higher than expected turnout:\n\n\n\n\n\nPrecinct\nTurnout\n% of expected turnout\n\n\n\n\nSEA 34-1823\n0.07\n0.27\n\n\nSEA 43-1788\n0.11\n0.15\n\n\nSEA 36-1717\n0.08\n0.13\n\n\nSEA 43-3628\n0.07\n0.13\n\n\nSEA 46-2325\n0.08\n0.12\n\n\nSEA 36-1732\n0.07\n0.11\n\n\nSEA 36-1675\n0.08\n0.11\n\n\nSEA 36-1661\n0.08\n0.10\n\n\nSEA 46-2377\n0.07\n0.10\n\n\nSEA 43-1992\n0.07\n0.10"
+  },
+  {
+    "objectID": "index.html#top-ten-precincts-with-lower-than-expected-turnout",
+    "href": "index.html#top-ten-precincts-with-lower-than-expected-turnout",
+    "title": "2025 Seattle general election ballot return statistics",
+    "section": "Top ten precincts with lower than expected turnout:",
+    "text": "Top ten precincts with lower than expected turnout:\n\n\n\n\n\nPrecinct\nTurnout\n% of expected turnout\n\n\n\n\nSEA 34-3693\n0\n0\n\n\nSEA 36-1384\n0\n0\n\n\nSEA 37-1559\n0\n0\n\n\nSEA 37-1575\n0\n0\n\n\nSEA 37-1875\n0\n0\n\n\nSEA 37-3159\n0\n0\n\n\nSEA 37-3969\n0\n0\n\n\nSEA 43-3997\n0\n0\n\n\nSEA 46-2081\n0\n0\n\n\nSEA 37-1555\n0\n0"
+  },
+  {
+    "objectID": "index.html#explore-return-data-yourself",
+    "href": "index.html#explore-return-data-yourself",
+    "title": "2025 Seattle general election ballot return statistics",
+    "section": "Explore return data yourself!",
+    "text": "Explore return data yourself!\n\n\n Download precinct return data as csv"
+  },
+  {
+    "objectID": "index.html#other-options",
+    "href": "index.html#other-options",
+    "title": "2025 Seattle general election ballot return statistics",
+    "section": "Other options",
+    "text": "Other options\nPrecinct-level turnout can be examined relative to projected turnout, primary turnout, and many demographic characteristics. Demographic characteristics include average age, racial makeup, educational attainment, dominant commute mode, owner vs renter occupied, average income, average home values, and dominant languages.\nVoter-level data (i.e., whether an individual ballot has been returned) can be examined relative to projected turnout likelihood, recent voting history (e.g., primary), age, and gender."
+  }
+]
