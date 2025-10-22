@@ -19,7 +19,7 @@ jobs:
       - name: Install necessary system libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev libudunits2-dev     
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev libudunits2-dev libgdal-dev gdal-bin     
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
