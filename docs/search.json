@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "2025 Seattle general election ballot return statistics",
     "section": "",
-    "text": "Map of absolute turnout and turnout relative to projected turnout through DATE WILL GO HERE.\nRight now data uses the primary election as a placeholder. Beginning two weeks from election day, this can get updated daily with live data. Importantly, some of th areas of lowest primary turnout (e.g., Rainier Valley) also exceeded expectations (relative to expected general election turnout) more than any other area. Model-based predictions of turnout may struggle to capture the current (national) political environment and a more energized voting population. Primary turnout may be a useful metric to compare to, in additional to model-based predictions."
+    "text": "Map of absolute turnout and turnout relative to projected turnout through 2025-10-21."
   },
   {
     "objectID": "index.html#top-ten-precincts-with-higher-than-expected-turnout",
@@ -18,7 +18,7 @@
     "href": "index.html#top-ten-precincts-with-lower-than-expected-turnout",
     "title": "2025 Seattle general election ballot return statistics",
     "section": "Top ten precincts with lower than expected turnout:",
-    "text": "Top ten precincts with lower than expected turnout:\n\n\n\n\n\nPrecinct\nTurnout\n% of expected turnout\n\n\n\n\nSEA 34-3693\n0\n0\n\n\nSEA 36-1384\n0\n0\n\n\nSEA 37-1559\n0\n0\n\n\nSEA 37-1575\n0\n0\n\n\nSEA 37-1875\n0\n0\n\n\nSEA 37-3159\n0\n0\n\n\nSEA 37-3969\n0\n0\n\n\nSEA 43-3997\n0\n0\n\n\nSEA 46-2081\n0\n0\n\n\nSEA 37-1555\n0\n0"
+    "text": "Top ten precincts with lower than expected turnout:\n\n\n\n\n\nPrecinct\nTurnout\n% of expected turnout\n\n\n\n\nSEA 34-3693\n0\n0\n\n\nSEA 36-1384\n0\n0\n\n\nSEA 37-1559\n0\n0\n\n\nSEA 37-1575\n0\n0\n\n\nSEA 37-1875\n0\n0\n\n\nSEA 37-3159\n0\n0\n\n\nSEA 37-3969\n0\n0\n\n\nSEA 43-3997\n0\n0\n\n\nSEA 46-2081\n0\n0\n\n\nSEA 37-1555\n0\n0\n\n\n\n\n\n\n\n Download precinct return data as csv"
   },
   {
     "objectID": "index.html#other-options",

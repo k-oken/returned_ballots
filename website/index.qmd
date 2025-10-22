@@ -37,7 +37,6 @@ download.file(
   destfile = here('data/daily_returns.zip'),
   method = "curl"
 )
-Sys.chmod(here('data/daily_returns.zip'), mode = "0777")
 # Suppresses a warning
 # I think it is because the Party column has zero entries
 # Or maybe some trailing commas
@@ -123,7 +122,8 @@ precinct_returns_tmp <- voter_returns |>
     avg_age = mean(age, na.rm = TRUE),
     # there are some voters not in my voter database that are in the predicted turnout
     avg_age_voted = sum(age * (ballot_status == 'Accepted'), na.rm = TRUE) /
-      sum(ballot_status == 'Accepted', na.rm = TRUE)
+      sum(ballot_status == 'Accepted', na.rm = TRUE),
+    n_reg_voters = n()
   ) |>
   mutate(
     pct_of_expected = obs_turnout / exp_turnout,
@@ -205,6 +205,30 @@ precinct_returns |>
   kableExtra::kable_styling(full_width = FALSE)
 ```
 
+## Explore return data yourself!
+
+```{r}
+precinct_returns |>
+  select(
+    precinct = name,
+    precinct_code,
+    obs_turnout,
+    exp_turnout,
+    primary_turnout,
+    pct_of_expected,
+    pct_of_primary,
+    n_reg_voters
+  ) |>
+  as.data.frame() |>
+  downloadthis::download_this(
+    output_extension = '.csv',
+    button_label = 'Download precinct return data as csv',
+    button_type = 'primary',
+    has_icon = TRUE,
+    icon = 'fa fa-save'
+  )
+
+```
 ## Other options
 
 Precinct-level turnout can be examined relative to projected turnout, primary turnout, and many demographic characteristics. Demographic characteristics include average age, racial makeup, educational attainment, dominant commute mode, owner vs renter occupied, average income, average home values, and dominant languages. 
