@@ -2,9 +2,21 @@
 title: "2025 Seattle general election ballot return statistics"
 ---
 
-Map of absolute turnout and turnout relative to projected turnout through DATE WILL GO HERE. 
+```{r}
+#| label: get-date
+current_time <- Sys.time() |>
+  lubridate::with_tz(tzone = "America/Los_Angeles") |>
+  lubridate::hour()
 
-Right now data uses the primary election as a placeholder. Beginning two weeks from election day, this can get updated daily with live data. Importantly, some of th areas of lowest primary turnout (e.g., Rainier Valley) also exceeded expectations (relative to expected general election turnout) more than any other area. Model-based predictions of turnout may struggle to capture the current (national) political environment and a more energized voting population. Primary turnout may be a useful metric to compare to, in additional to model-based predictions.
+# after 5pm Pacific use today. Otherwise use yesterday.
+if (current_time > 17) {
+  today <- Sys.Date()
+} else {
+  today <- Sys.Date() - 1
+}
+```
+Map of absolute turnout and turnout relative to projected turnout through `r today`. 
+
 ```{r, message = FALSE}
 #| label: data-prep
 
@@ -14,13 +26,23 @@ library(ggplot2)
 library(sf)
 
 i_am('website/index.qmd')
-today <- Sys.Date()
 
-# Read in actual returns (for now is a dummy from primary)
+# read in data
+download.file(
+  paste0(
+    'https://www.sos.wa.gov/sites/default/files/current_election/Statewide',
+    today,
+    '.zip'
+  ),
+  destfile = here('data/daily_returns.zip'),
+  method = "curl"
+)
+Sys.chmod(here('data/daily_returns.zip'), mode = "0777")
 # Suppresses a warning
 # I think it is because the Party column has zero entries
+# Or maybe some trailing commas
 obs_returns <- readr::read_csv(
-  'https://www.sos.wa.gov/sites/default/files/past_elections/2025-08/King.csv',
+  here('data/daily_returns.zip'),
   col_types = 'cicccccccccccicdccc',
   col_select = -Party
 ) |>
@@ -35,6 +57,21 @@ obs_returns <- readr::read_csv(
   mutate(
     received_date = lubridate::mdy_hms(received_date), # time stamp doesn't work, oh well.
   )
+
+primary_returns <- readr::read_csv(
+  'https://www.sos.wa.gov/sites/default/files/past_elections/2025-08/King.csv',
+  col_types = 'cicccccccccccicdccc',
+  col_select = -Party
+) |>
+  rename_all(
+    ~ stringr::str_replace(
+      stringr::str_to_lower(.),
+      pattern = ' ',
+      replacement = '_'
+    )
+  ) |>
+  filter(stringr::str_detect(precinct, 'SEA')) |>
+  select(voter_id, election, ballot_status)
 
 # Read predicted returns
 predicted_returns <- readr::read_csv(here(
@@ -67,6 +104,7 @@ voter_returns <- predicted_returns |>
   left_join(
     select(obs_returns, -c(county:election, address:country))
   ) |>
+  left_join(primary_returns, by = 'voter_id', suffix = c('', '_primary')) |>
   left_join(voter_database) |>
   mutate(
     voter_id = as.integer(voter_id),
@@ -80,12 +118,17 @@ precinct_returns_tmp <- voter_returns |>
   summarise(
     obs_turnout = sum(ballot_status == 'Accepted', na.rm = TRUE) / n(),
     exp_turnout = mean(p_turnout_raw, na.rm = TRUE),
+    primary_turnout = sum(ballot_status_primary == 'Accepted', na.rm = TRUE) /
+      n(),
     avg_age = mean(age, na.rm = TRUE),
     # there are some voters not in my voter database that are in the predicted turnout
     avg_age_voted = sum(age * (ballot_status == 'Accepted'), na.rm = TRUE) /
       sum(ballot_status == 'Accepted', na.rm = TRUE)
   ) |>
-  mutate(resid_turnout = obs_turnout - exp_turnout)
+  mutate(
+    pct_of_expected = obs_turnout / exp_turnout,
+    pct_of_primary = obs_turnout / primary_turnout
+  )
 
 # there are some precincts in predicted turnout that don't show up in demographics
 # also some precincts in demographics that seem to not be in Seattle
@@ -109,13 +152,25 @@ obs_turnout <- ggplot(precinct_returns) +
   labs(fill = 'Turnout') +
   theme(legend.position = 'top')
 
-resid_turnout <- ggplot(precinct_returns) +
-  geom_sf(aes(fill = resid_turnout)) +
+pct_of_expected <- ggplot(precinct_returns) +
+  geom_sf(aes(fill = pct_of_expected)) +
   viridis::scale_fill_viridis(option = 'mako') +
-  labs(fill = 'Obs. - Exp. Turnout') +
+  labs(fill = '% exp. turnout') +
   theme(legend.position = 'top')
 
-cowplot::plot_grid(obs_turnout, resid_turnout, align = 'v')
+pct_of_primary <- ggplot(precinct_returns) +
+  geom_sf(aes(fill = pct_of_primary)) +
+  viridis::scale_fill_viridis(option = 'mako') +
+  labs(fill = '% of prim. turnout') +
+  theme(legend.position = 'top')
+
+cowplot::plot_grid(
+  obs_turnout,
+  pct_of_expected,
+  pct_of_primary,
+  align = 'v',
+  nrow = 1
+)
 ```
 
 ## Top ten precincts with higher than expected turnout:
@@ -123,11 +178,11 @@ cowplot::plot_grid(obs_turnout, resid_turnout, align = 'v')
 precinct_returns |>
   as.data.frame() |>
   as_tibble() |>
-  arrange(desc(resid_turnout)) |>
+  arrange(desc(pct_of_expected)) |>
   select(
     Precinct = name,
     Turnout = obs_turnout,
-    `Obs - Exp Turnout` = resid_turnout
+    `% of expected turnout` = pct_of_expected
   ) |>
   slice(1:10) |>
   knitr::kable(digits = 2) |>
@@ -139,11 +194,11 @@ precinct_returns |>
 precinct_returns |>
   as.data.frame() |>
   as_tibble() |>
-  arrange(resid_turnout) |>
+  arrange(pct_of_expected) |>
   select(
     Precinct = name,
     Turnout = obs_turnout,
-    `Obs - Exp Turnout` = resid_turnout
+    `% of expected turnout` = pct_of_expected
   ) |>
   slice(1:10) |>
   knitr::kable(digits = 2) |>
