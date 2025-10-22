@@ -16,10 +16,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install Fontconfig and FreeType2
+      - name: Install necessary system libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev        
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev       
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
