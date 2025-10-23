@@ -224,16 +224,14 @@ precinct_returns |>
     pct_of_primary,
     n_reg_voters
   ) |>
-  knitr::kable() |>
-  kableExtra::scroll_box(height = '500px', width = '1000px')
-  # downloadthis::download_this(
-  #   output_name = paste0('returns_', today),
-  #   output_extension = '.csv',
-  #   button_label = 'Download precinct return data as csv',
-  #   button_type = 'primary',
-  #   has_icon = TRUE,
-  #   icon = 'fa fa-save'
-  # )
+  downloadthis::download_this(
+    output_name = paste0('returns_', today),
+    output_extension = '.csv',
+    button_label = 'Download precinct return data as csv',
+    button_type = 'primary',
+    has_icon = TRUE,
+    icon = 'fa fa-save'
+  )
 
 ```
 ## Other options
