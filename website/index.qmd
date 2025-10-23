@@ -4,35 +4,8 @@ title: "2025 Seattle general election ballot return statistics"
 
 ```{r}
 #| label: get-date
-current_time <- Sys.time() |>
-  lubridate::with_tz(tzone = "America/Los_Angeles") |>
-  lubridate::hour()
 
-# Get date. This *should* work most of the time...
-if(Sys.timezone() == 'America/Los_Angeles') { # System is PDT
-    today <- Sys.Date()
- } else if(Sys.timezone() == 'UTC') { # System is UTC
-    today <- Sys.Date() - 1
- } else stop('System is not Pacific or UTC time zone')
-
-# before 5pm Pacific bump back a day
-if (current_time < 17) { # before 5pm Pacific
-  today <- today - 1
-}
-```
-Map of absolute turnout and turnout relative to projected turnout through `r today`. 
-
-```{r, message = FALSE}
-#| label: data-prep
-
-library(here)
-library(dplyr)
-library(ggplot2)
-library(sf)
-
-i_am('website/index.qmd')
-
-# read in data
+today <- Sys.Date()
 run_success <- FALSE
 n_run <- 0
 # this should bump back the date if it is having trouble downloading (i.e., date is wrong)
@@ -53,6 +26,21 @@ while (!run_success & n_run <= 3) {
     today <- today - 1
   }
 }
+
+```
+Map of absolute turnout and turnout relative to projected turnout through `r today`. 
+
+```{r, message = FALSE}
+#| label: data-prep
+
+library(here)
+library(dplyr)
+library(ggplot2)
+library(sf)
+
+i_am('website/index.qmd')
+
+# read in data
 
 # Suppresses a warning
 # I think it is because the Party column has zero entries
