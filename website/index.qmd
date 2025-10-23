@@ -4,6 +4,12 @@ title: "2025 Seattle general election ballot return statistics"
 
 ```{r}
 #| label: get-date
+library(here)
+library(dplyr)
+library(ggplot2)
+library(sf)
+
+i_am('website/index.qmd')
 
 today <- Sys.Date()
 run_success <- FALSE
@@ -32,13 +38,6 @@ Map of absolute turnout and turnout relative to projected turnout through `r tod
 
 ```{r, message = FALSE}
 #| label: data-prep
-
-library(here)
-library(dplyr)
-library(ggplot2)
-library(sf)
-
-i_am('website/index.qmd')
 
 # read in data
 
@@ -228,7 +227,7 @@ precinct_returns |>
   ) |>
   as.data.frame() |>
   downloadthis::download_this(
-    output_name = paste0('returns_', today)
+    output_name = paste0('returns_', today),
     output_extension = '.csv',
     button_label = 'Download precinct return data as csv',
     button_type = 'primary',
