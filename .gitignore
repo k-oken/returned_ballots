@@ -50,6 +50,7 @@ rsconnect/
 
 # site folder
 /_site/
+website/_site/
 
 # voter data (confidential)
 data/20251001_VRDB_Extract.txt

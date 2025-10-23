@@ -133,7 +133,6 @@ precinct_returns_tmp <- voter_returns |>
     pct_of_expected = obs_turnout / exp_turnout,
     pct_of_primary = obs_turnout / primary_turnout
   )
-
 # there are some precincts in predicted turnout that don't show up in demographics
 # also some precincts in demographics that seem to not be in Seattle
 # therefore, useing inner_join
@@ -142,7 +141,6 @@ precinct_returns <- inner_join(
   precinct_returns_tmp,
   by = c(precinct_code = 'precinct4')
 )
-
 ```
 
 
@@ -215,6 +213,7 @@ precinct_returns |>
 #| label: download-button
 
 precinct_returns |>
+  as.data.frame() |>
   select(
     precinct = name,
     precinct_code,
@@ -225,15 +224,16 @@ precinct_returns |>
     pct_of_primary,
     n_reg_voters
   ) |>
-  as.data.frame() |>
-  downloadthis::download_this(
-    output_name = paste0('returns_', today),
-    output_extension = '.csv',
-    button_label = 'Download precinct return data as csv',
-    button_type = 'primary',
-    has_icon = TRUE,
-    icon = 'fa fa-save'
-  )
+  knitr::kable() |>
+  kableExtra::scroll_box(height = '500px', width = '1000px')
+  # downloadthis::download_this(
+  #   output_name = paste0('returns_', today),
+  #   output_extension = '.csv',
+  #   button_label = 'Download precinct return data as csv',
+  #   button_type = 'primary',
+  #   has_icon = TRUE,
+  #   icon = 'fa fa-save'
+  # )
 
 ```
 ## Other options
