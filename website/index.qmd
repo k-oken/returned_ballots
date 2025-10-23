@@ -208,6 +208,8 @@ precinct_returns |>
 ## Explore return data yourself!
 
 ```{r}
+#| label: download-button
+
 precinct_returns |>
   select(
     precinct = name,
@@ -221,6 +223,7 @@ precinct_returns |>
   ) |>
   as.data.frame() |>
   downloadthis::download_this(
+    output_name = paste0('returns_', today)
     output_extension = '.csv',
     button_label = 'Download precinct return data as csv',
     button_type = 'primary',
