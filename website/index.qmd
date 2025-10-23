@@ -8,11 +8,16 @@ current_time <- Sys.time() |>
   lubridate::with_tz(tzone = "America/Los_Angeles") |>
   lubridate::hour()
 
-# after 5pm Pacific use today. Otherwise use yesterday.
-if (current_time > 17) {
-  today <- Sys.Date()
-} else {
-  today <- Sys.Date() - 1
+# Get date. This *should* work most of the time...
+if(Sys.timezone() == 'America/Los_Angeles') { # System is PDT
+    today <- Sys.Date()
+ } else if(Sys.timezone() == 'UTC') { # System is UTC
+    today <- Sys.Date - 1
+ } else stop('System is not Pacific or UTC time zone')
+
+# before 5pm Pacific bump back a day
+if (current_time < 17) { # before 5pm Pacific
+  today <- today - 1
 }
 ```
 Map of absolute turnout and turnout relative to projected turnout through `r today`. 
@@ -28,15 +33,27 @@ library(sf)
 i_am('website/index.qmd')
 
 # read in data
-download.file(
-  paste0(
-    'https://www.sos.wa.gov/sites/default/files/current_election/Statewide',
-    today,
-    '.zip'
-  ),
-  destfile = here('data/daily_returns.zip'),
-  method = "curl"
-)
+run_success <- FALSE
+n_run <- 0
+# this should bump back the date if it is having trouble downloading (i.e., date is wrong)
+while (!run_success & n_run <= 3) {
+  download.file(
+    paste0(
+      'https://www.sos.wa.gov/sites/default/files/current_election/Statewide',
+      today,
+      '.zip'
+    ),
+    destfile = here('data/daily_returns.zip'),
+    method = "curl"
+  )
+  if (file.size(here('data/daily_returns.zip')) > 200000) {
+    run_success <- TRUE
+  } else {
+    n_run <- n_run + 1
+    today <- today - 1
+  }
+}
+
 # Suppresses a warning
 # I think it is because the Party column has zero entries
 # Or maybe some trailing commas
