@@ -12,7 +12,7 @@ current_time <- Sys.time() |>
 if(Sys.timezone() == 'America/Los_Angeles') { # System is PDT
     today <- Sys.Date()
  } else if(Sys.timezone() == 'UTC') { # System is UTC
-    today <- Sys.Date - 1
+    today <- Sys.Date() - 1
  } else stop('System is not Pacific or UTC time zone')
 
 # before 5pm Pacific bump back a day
