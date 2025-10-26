@@ -33,6 +33,7 @@ while (!run_success & n_run <= 3) {
   }
 }
 
+unzip(zipfile = here('data/daily_returns.zip'), exdir = here('data'))
 ```
 Map of absolute turnout and turnout relative to projected turnout through `r today`. 
 
@@ -44,22 +45,25 @@ Map of absolute turnout and turnout relative to projected turnout through `r tod
 # Suppresses a warning
 # I think it is because the Party column has zero entries
 # Or maybe some trailing commas
-obs_returns <- readr::read_csv(
-  here('data/daily_returns.zip'),
-  col_types = 'cicccccccccccicdccc',
-  col_select = -Party
-) |>
+obs_returns_tmp <- read.csv(here('data', paste0('Ballot Status Report ', today, '.csv')))
+obs_returns <- obs_returns_tmp[-ncol(obs_returns_tmp)] |>
+  `names<-`(names(obs_returns_tmp)[-1]) |>
+  as_tibble() |>
   rename_all(
     ~ stringr::str_replace(
       stringr::str_to_lower(.),
-      pattern = ' ',
+      pattern = '\\.',
       replacement = '_'
     )
   ) |>
+  mutate(ballot_id = row.names(obs_returns_tmp)) |>
+  relocate(ballot_id, .before = voter_id) |>
   filter(stringr::str_detect(precinct, 'SEA')) |>
   mutate(
     received_date = lubridate::mdy_hms(received_date), # time stamp doesn't work, oh well.
-  )
+    voter_id = as.integer(voter_id)
+  ) |>
+  select(-party)
 
 primary_returns <- readr::read_csv(
   'https://www.sos.wa.gov/sites/default/files/past_elections/2025-08/King.csv',
@@ -106,7 +110,7 @@ voter_returns <- predicted_returns |>
   select(voter_id, p_turnout_raw, turnout_flag_raw, precinct4) |>
   left_join(
     select(obs_returns, -c(county:election, address:country))
-  ) |>
+  ) |> 
   left_join(primary_returns, by = 'voter_id', suffix = c('', '_primary')) |>
   left_join(voter_database) |>
   mutate(
