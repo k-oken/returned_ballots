@@ -4,6 +4,14 @@ title: "2025 Seattle general election ballot return statistics"
 
 ```{r}
 #| label: get-date
+
+if (requireNamespace("renv", quietly = TRUE)) {
+  # This finds the renv project root, even if the .qmd is in a subdirectory
+  root <- renv::activate(project = rprojroot::find_root(rprojroot::has_file("renv.lock")))
+  # Explicitly load the environment
+  renv::load(project = root)
+}
+
 library(here)
 library(dplyr)
 library(ggplot2)
@@ -105,6 +113,15 @@ demographics <- sf::st_read(
   filter(stringr::str_detect(name, 'SEA')) |>
   mutate(precinct_code = stringr::str_extract(name, '(?<=-)[:digit:]+'))
 
+# read in primary results (not turnout)
+primary <- readr::read_csv(here('data/final-results-report-with-districts.csv')) |>
+  filter(Race == 'City of Seattle Mayor') |>
+  group_by(Precinct) |>
+  summarize(
+    pct_wilson = sum(SumOfCount * (CounterType == 'Katie Wilson')) /
+      sum(SumOfCount * (CounterType == 'Times Counted'))
+  ) 
+
 # Join data frames for voter level return data
 voter_returns <- predicted_returns |>
   select(voter_id, p_turnout_raw, turnout_flag_raw, precinct4) |>
@@ -144,7 +161,8 @@ precinct_returns <- inner_join(
   demographics,
   precinct_returns_tmp,
   by = c(precinct_code = 'precinct4')
-)
+) |>
+  left_join(primary, by = c(name = 'Precinct'))
 ```
 
 
@@ -152,26 +170,32 @@ precinct_returns <- inner_join(
 #| label: turnout-map
 theme_set(theme_bw())
 
-obs_turnout <- ggplot(precinct_returns) +
+obs_turnout <- ggplot(precinct_returns, aes(text = paste('precinct:', name, 
+                                                         '\n% wilson primary:', round(pct_wilson, 3),
+                                                         '\ncurrent turnout:', round(obs_turnout, 3)))) +
   geom_sf(aes(fill = obs_turnout)) +
-  viridis::scale_fill_viridis(option = 'mako') +
+  viridis::scale_fill_viridis(option = 'mako', 
+                              labels = scales::percent_format(accuracy = 0.1)) +
   labs(fill = 'Turnout') +
   theme(legend.position = 'top')
 
 pct_of_expected <- ggplot(precinct_returns) +
   geom_sf(aes(fill = pct_of_expected)) +
-  viridis::scale_fill_viridis(option = 'mako') +
+  viridis::scale_fill_viridis(option = 'mako', 
+                              labels = scales::percent_format(accuracy = 0.1)) +
   labs(fill = '% exp. turnout') +
   theme(legend.position = 'top')
 
 pct_of_primary <- ggplot(precinct_returns) +
   geom_sf(aes(fill = pct_of_primary)) +
-  viridis::scale_fill_viridis(option = 'mako') +
+  viridis::scale_fill_viridis(option = 'mako', 
+                              labels = scales::percent_format(accuracy = 0.1)) +
   labs(fill = '% of prim. turnout') +
   theme(legend.position = 'top')
 
+plotly::ggplotly(obs_turnout, tooltip = 'text')
+
 cowplot::plot_grid(
-  obs_turnout,
   pct_of_expected,
   pct_of_primary,
   align = 'v',
