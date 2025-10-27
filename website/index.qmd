@@ -212,7 +212,8 @@ precinct_returns |>
   select(
     Precinct = name,
     Turnout = obs_turnout,
-    `% of expected turnout` = pct_of_expected
+    `% of expected turnout` = pct_of_expected,
+    `% Wilson in primary` = pct_wilson
   ) |>
   slice(1:10) |>
   knitr::kable(digits = 2) |>
@@ -228,7 +229,8 @@ precinct_returns |>
   select(
     Precinct = name,
     Turnout = obs_turnout,
-    `% of expected turnout` = pct_of_expected
+    `% of expected turnout` = pct_of_expected,
+    `% Wilson in primary` = pct_wilson
   ) |>
   slice(1:10) |>
   knitr::kable(digits = 2) |>
@@ -250,7 +252,8 @@ precinct_returns |>
     primary_turnout,
     pct_of_expected,
     pct_of_primary,
-    n_reg_voters
+    n_reg_voters,
+    pct_wilson_primary = pct_wilson
   ) |>
   downloadthis::download_this(
     output_name = paste0('returns_', today),
