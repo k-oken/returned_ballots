@@ -22,7 +22,7 @@ i_am('website/index.qmd')
 load(here::here('cache/shared_objects.RData'))
 ```
 
-# Most recent rejected ballots
+## Most recent rejected ballots
 
 These ballots were received on `r today`.
 ```{r}
@@ -44,7 +44,7 @@ obs_returns |>
   )
 ```
 
-# All rejected ballots
+## All rejected ballots
 
 Full list of rejected ballots
 ```{r}
