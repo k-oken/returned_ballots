@@ -116,15 +116,8 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#most-recent-rejected-ballots" id="toc-most-recent-rejected-ballots" class="nav-link active" data-scroll-target="#most-recent-rejected-ballots">Most recent rejected ballots</a></li>
-  <li><a href="#all-rejected-ballots" id="toc-all-rejected-ballots" class="nav-link" data-scroll-target="#all-rejected-ballots">All rejected ballots</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -148,43 +141,6 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="most-recent-rejected-ballots" class="level2">
-<h2 class="anchored" data-anchor-id="most-recent-rejected-ballots">Most recent rejected ballots</h2>
-<p>These ballots were received on 2025-10-28.</p>
-<div class="cell">
-<div class="cell-output-display">
-<button class="btn btn-primary" onclick="
-    async function downloadFile(event) {
-      event.preventDefault();
-      try {
-        const response = await fetch('data:text/csv;base64,YmFsbG90X2lkLHZvdGVyX2lkLGZpcnN0X25hbWUsbGFzdF9uYW1lLGdlbmRlcixiYWxsb3Rfc3RhdHVzLGNoYWxsZW5nZV9yZWFzb24scmVjZWl2ZWRfZGF0ZSxhZGRyZXNzLGNpdHksc3RhdGUsemlwLGNvdW50cnksc3BsaXQscHJlY2luY3QscmV0dXJuX21ldGhvZCxyZXR1cm5fbG9jYXRpb24sYWdlLHN1cHBvcnRfZmxhZ19nZW5lcmFsCg==');
-        if (!response.ok) throw new Error('Network response failed');
-        const blob = await response.blob();
-        const blobUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = 'rejected_ballots_2025-10-28.csv';
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.dispatchEvent(new MouseEvent('click'));
-        document.body.removeChild(a);
-        setTimeout(() => {
-          window.URL.revokeObjectURL(blobUrl);
-        }, 100);
-        return false;
-      } catch (error) {
-        console.error('Download failed:', error);
-        alert('Download failed. Please try again.');
-      }
-    }
-    downloadFile(event);
-  " has_icon="TRUE"><i class="fa fa-save"></i> Download rejected ballots received 2025-10-28</button>
-</div>
-</div>
-</section>
-<section id="all-rejected-ballots" class="level2">
-<h2 class="anchored" data-anchor-id="all-rejected-ballots">All rejected ballots</h2>
-<p>Full list of rejected ballots</p>
 <div class="cell">
 <div class="cell-output-display">
 <button class="btn btn-primary" onclick="
@@ -217,7 +173,6 @@ ul.task-list li input[type="checkbox"] {
 </div>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
