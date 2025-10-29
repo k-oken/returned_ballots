@@ -30,15 +30,22 @@ obs_returns |>
   filter(ballot_status == 'Rejected') |>
   select(-election, -county) |>
   mutate(received_date = lubridate::ymd(received_date)) |>
-  left_join(select(vote_forecast, voter_id, age = Age, support_flag_general)) |>
+  left_join(select(
+    vote_forecast,
+    voter_id,
+    age = Age,
+    support_flag = support_flag_hiercal
+  )) |>
+  filter(stringr::str_detect(support_flag, 'High')) |>
   arrange(desc(received_date)) |>
-  downloadthis::download_this(
-    output_name = paste0('rejected_ballots_', today),
-    output_extension = '.csv',
-    button_label = 'Download list of voters with rejected ballots',
-    button_type = 'primary',
-    has_icon = TRUE,
-    icon = 'fa fa-save',
-    csv2 = FALSE
-  )
+  View()
+downloadthis::download_this(
+  output_name = paste0('rejected_ballots_', today),
+  output_extension = '.csv',
+  button_label = 'Download list of voters with rejected ballots',
+  button_type = 'primary',
+  has_icon = TRUE,
+  icon = 'fa fa-save',
+  csv2 = FALSE
+)
 ```
