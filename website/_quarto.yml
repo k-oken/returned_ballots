@@ -1,6 +1,7 @@
 project:
   type: website
   execute-dir: project
+  pre-render: prepare.R
 
 website:
   title: "Ballot return statistics"

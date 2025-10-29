@@ -1,5 +1,55 @@
 ---
-title: "Other tabs?"
+title: "Turnout & support map"
 ---
 
-Additional tabs could go here.
+```{r}
+#| label: prep
+if (requireNamespace("renv", quietly = TRUE)) {
+  # This finds the renv project root, even if the .qmd is in a subdirectory
+  root <- renv::activate(
+    project = rprojroot::find_root(rprojroot::has_file("renv.lock"))
+  )
+  # Explicitly load the environment
+  renv::load(project = root)
+}
+
+library(here)
+library(dplyr)
+library(ggplot2)
+library(sf)
+
+i_am('website/index.qmd')
+
+load(here::here('cache/shared_objects.RData'))
+
+theme_set(theme_bw())
+```
+
+This map shows precincts that Katie won (>50%) in blue and Katie did not win (<50%) in red. Saturation/transparency of the color indicates current turnout *relative to what we expect for the precinct*.
+```{r}
+plt <- precinct_returns |>
+  mutate(
+    primary_candidate = ifelse(pct_wilson > 0.5, 'Wilson', 'Harrell/other'),
+    f_pct_expected = cut(pct_of_expected, breaks = seq(0, 0.5, by = 0.075))
+  ) |>
+  ggplot(aes(
+    fill = primary_candidate,
+    text = paste(
+      'Precinct:',
+      name,
+      '\nTurnout:',
+      round(obs_turnout, 3),
+      '\n% of expected turnout:',
+      round(pct_of_expected, 3),
+      '\nprimary % wilson:',
+      round(pct_wilson, 3)
+    )
+  )) +
+  geom_sf(linewidth = 0.1, aes(alpha = f_pct_expected)) +
+  scale_fill_manual(values = c('red', 'blue')) +
+  scale_alpha_discrete(range = c(0.1, 1)) +
+  labs(fill = 'Primary supporter', alpha = '% of expected turnout')
+
+plotly::ggplotly(plt, tooltip = 'text')
+
+```
