@@ -11,6 +11,7 @@ website:
       - href: index.qmd
         text: Home
       - about.qmd
+      - ballot_curing.qmd
 
 format:
   html:

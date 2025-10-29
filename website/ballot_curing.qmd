@@ -1,0 +1,44 @@
+---
+title: "Ballot curing"
+---
+
+```{r}
+#| label: prep
+
+if (requireNamespace("renv", quietly = TRUE)) {
+  # This finds the renv project root, even if the .qmd is in a subdirectory
+  root <- renv::activate(
+    project = rprojroot::find_root(rprojroot::has_file("renv.lock"))
+  )
+  # Explicitly load the environment
+  renv::load(project = root)
+}
+
+library(here)
+library(dplyr)
+
+i_am('website/index.qmd')
+
+load(here::here('cache/shared_objects.RData'))
+```
+
+
+```{r}
+vote_forecast <- readr::read_csv(here('data/voter_forecast_2025_hiercal.csv'))
+
+obs_returns |>
+  filter(ballot_status == 'Rejected') |>
+  select(-election, -county) |>
+  mutate(received_date = lubridate::ymd(received_date)) |>
+  left_join(select(vote_forecast, voter_id, age = Age, support_flag_general)) |>
+  arrange(desc(received_date)) |>
+  downloadthis::download_this(
+    output_name = paste0('rejected_ballots_', today),
+    output_extension = '.csv',
+    button_label = 'Download list of voters with rejected ballots',
+    button_type = 'primary',
+    has_icon = TRUE,
+    icon = 'fa fa-save',
+    csv2 = FALSE
+  )
+```

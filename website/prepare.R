@@ -182,6 +182,7 @@ if (!dir.exists(here('cache'))) {
 save(
   precinct_returns,
   voter_returns,
+  obs_returns,
   today,
   file = here('cache/shared_objects.RData')
 )

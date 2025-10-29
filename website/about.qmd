@@ -87,6 +87,5 @@ plt <- precinct_returns |>
   labs(fill = 'Primary supporter', alpha = '% of expected turnout')
 
 plotly::ggplotly(plt, tooltip = 'text')
-
 ```
 
