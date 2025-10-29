@@ -25,7 +25,37 @@ load(here::here('cache/shared_objects.RData'))
 theme_set(theme_bw())
 ```
 
+This map shows precincts that Katie won (>50%) in blue and Katie did not win (<50%) in red. Saturation/transparency of the color indicates absolute current turnout as of `r today`.
+```{r}
+plt <- precinct_returns |>
+  mutate(
+    primary_candidate = ifelse(pct_wilson > 0.5, 'Wilson', 'Harrell/other'),
+    f_turnout = cut(obs_turnout, breaks = seq(0, 0.5, by = 0.075))
+  ) |>
+  ggplot(aes(
+    fill = primary_candidate,
+    text = paste(
+      'Precinct:',
+      name,
+      '\nTurnout:',
+      round(obs_turnout, 3),
+      '\n% of expected turnout:',
+      round(pct_of_expected, 3),
+      '\nprimary % wilson:',
+      round(pct_wilson, 3)
+    )
+  )) +
+  geom_sf(linewidth = 0.1, aes(alpha = f_turnout)) +
+  scale_fill_manual(values = c('red', 'blue')) +
+  scale_alpha_discrete(range = c(0.1, 1)) +
+  labs(fill = 'Primary supporter', alpha = 'Turnout')
+
+plotly::ggplotly(plt, tooltip = 'text')
+
+```
+
 This map shows precincts that Katie won (>50%) in blue and Katie did not win (<50%) in red. Saturation/transparency of the color indicates current turnout *relative to what we expect for the precinct*.
+
 ```{r}
 plt <- precinct_returns |>
   mutate(
@@ -53,3 +83,4 @@ plt <- precinct_returns |>
 plotly::ggplotly(plt, tooltip = 'text')
 
 ```
+

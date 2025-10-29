@@ -1,11 +1,14 @@
-if (requireNamespace("renv", quietly = TRUE)) {
-  # This finds the renv project root, even if the .qmd is in a subdirectory
-  root <- renv::activate(
-    project = rprojroot::find_root(rprojroot::has_file("renv.lock"))
-  )
-  # Explicitly load the environment
-  renv::load(project = root)
+# --- 1. Ensure 'renv' package is available ---
+if (!requireNamespace("renv", quietly = TRUE)) {
+  # Install the renv package if it's missing (needed to read the lock file)
+  install.packages("renv", repos = "https://cloud.r-project.org/")
 }
+
+# --- 2. Restore Project Dependencies ---
+# This is the non-interactive command that reads renv.lock
+# and installs all required packages (like 'here', 'rprojroot', etc.)
+message("Restoring renv project library...")
+renv::restore()
 
 library(here)
 library(dplyr)
