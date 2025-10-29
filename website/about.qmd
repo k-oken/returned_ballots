@@ -30,7 +30,10 @@ This map shows precincts that Katie won (>50%) in blue and Katie did not win (<5
 plt <- precinct_returns |>
   mutate(
     primary_candidate = ifelse(pct_wilson > 0.5, 'Wilson', 'Harrell/other'),
-    f_turnout = cut(obs_turnout, breaks = seq(0, 0.5, by = 0.075))
+    f_turnout = cut(
+      obs_turnout,
+      breaks = seq(0, ceiling(max(obs_turnout) * 10) / 10, length.out = 6)
+    )
   ) |>
   ggplot(aes(
     fill = primary_candidate,
@@ -47,7 +50,7 @@ plt <- precinct_returns |>
   )) +
   geom_sf(linewidth = 0.1, aes(alpha = f_turnout)) +
   scale_fill_manual(values = c('red', 'blue')) +
-  scale_alpha_discrete(range = c(0.1, 1)) +
+  scale_alpha_discrete(range = c(0.15, 1)) +
   labs(fill = 'Primary supporter', alpha = 'Turnout')
 
 plotly::ggplotly(plt, tooltip = 'text')
@@ -60,7 +63,10 @@ This map shows precincts that Katie won (>50%) in blue and Katie did not win (<5
 plt <- precinct_returns |>
   mutate(
     primary_candidate = ifelse(pct_wilson > 0.5, 'Wilson', 'Harrell/other'),
-    f_pct_expected = cut(pct_of_expected, breaks = seq(0, 0.5, by = 0.075))
+    f_pct_expected = cut(
+      pct_of_expected,
+      breaks = seq(0, ceiling(max(pct_of_expected) * 10) / 10, length.out = 6)
+    )
   ) |>
   ggplot(aes(
     fill = primary_candidate,
@@ -77,7 +83,7 @@ plt <- precinct_returns |>
   )) +
   geom_sf(linewidth = 0.1, aes(alpha = f_pct_expected)) +
   scale_fill_manual(values = c('red', 'blue')) +
-  scale_alpha_discrete(range = c(0.1, 1)) +
+  scale_alpha_discrete(range = c(0.15, 1)) +
   labs(fill = 'Primary supporter', alpha = '% of expected turnout')
 
 plotly::ggplotly(plt, tooltip = 'text')

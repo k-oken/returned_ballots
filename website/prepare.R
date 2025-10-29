@@ -1,14 +1,31 @@
-# --- 1. Ensure 'renv' package is available ---
+# --- 1. Ensure RENV and RPROJROOT are available ---
+
+# Define the repository to use for installation
+repos_url <- "https://cloud.r-project.org/"
+
+# Check and install 'renv' package
 if (!requireNamespace("renv", quietly = TRUE)) {
-  # Install the renv package if it's missing (needed to read the lock file)
-  install.packages("renv", repos = "https://cloud.r-project.org/")
+  message("Installing 'renv'...")
+  install.packages("renv", repos = repos_url)
 }
 
-# --- 2. Restore Project Dependencies ---
-# This is the non-interactive command that reads renv.lock
-# and installs all required packages (like 'here', 'rprojroot', etc.)
-message("Restoring renv project library...")
-renv::restore()
+# Check and install 'rprojroot' package
+if (!requireNamespace("rprojroot", quietly = TRUE)) {
+  message("Installing 'rprojroot'...")
+  install.packages("rprojroot", repos = repos_url)
+}
+
+# --- 2. Find Root and Restore Dependencies ---
+
+# CRITICAL: Use the rprojroot package to find the directory containing renv.lock
+# This resolves the working directory mismatch issue.
+root <- rprojroot::find_root(rprojroot::has_file("renv.lock"))
+
+# Use renv::restore() with the explicit project path
+message("Restoring renv project library from: ", root)
+renv::restore(project = root)
+
+# Rest of script...
 
 library(here)
 library(dplyr)
@@ -158,7 +175,7 @@ precinct_returns <- inner_join(
 ) |>
   left_join(primary, by = c(name = 'Precinct'))
 
-if (!exists(here('cache'))) {
+if (!dir.exists(here('cache'))) {
   dir.create(here('cache'))
 }
 
