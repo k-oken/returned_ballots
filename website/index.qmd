@@ -117,7 +117,8 @@ precinct_returns |>
     button_label = 'Download precinct return data as csv',
     button_type = 'primary',
     has_icon = TRUE,
-    icon = 'fa fa-save'
+    icon = 'fa fa-save',
+    csv2 = FALSE
   )
 
 ```
