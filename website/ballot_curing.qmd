@@ -22,31 +22,7 @@ i_am('website/index.qmd')
 load(here::here('cache/shared_objects.RData'))
 ```
 
-## Most recent rejected ballots
 
-These ballots were received on `r today`.
-```{r}
-vote_forecast <- readr::read_csv(here('data/voter_forecast_2025_hiercal.csv'))
-
-obs_returns |>
-  filter(ballot_status == 'Rejected', received_date == today) |>
-  select(-election, -county) |>
-  mutate(received_date = lubridate::ymd(received_date)) |>
-  left_join(select(vote_forecast, voter_id, age = Age, support_flag_general)) |>
-  downloadthis::download_this(
-    output_name = paste0('rejected_ballots_', today),
-    output_extension = '.csv',
-    button_label = paste('Download rejected ballots received', today),
-    button_type = 'primary',
-    has_icon = TRUE,
-    icon = 'fa fa-save',
-    csv2 = FALSE
-  )
-```
-
-## All rejected ballots
-
-Full list of rejected ballots
 ```{r}
 vote_forecast <- readr::read_csv(here('data/voter_forecast_2025_hiercal.csv'))
 
