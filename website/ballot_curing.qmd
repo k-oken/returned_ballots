@@ -38,14 +38,13 @@ obs_returns |>
   )) |>
   filter(stringr::str_detect(support_flag, 'High')) |>
   arrange(desc(received_date)) |>
-  View()
-downloadthis::download_this(
-  output_name = paste0('rejected_ballots_', today),
-  output_extension = '.csv',
-  button_label = 'Download list of voters with rejected ballots',
-  button_type = 'primary',
-  has_icon = TRUE,
-  icon = 'fa fa-save',
-  csv2 = FALSE
-)
+  downloadthis::download_this(
+    output_name = paste0('rejected_ballots_', today),
+    output_extension = '.csv',
+    button_label = 'Download list of voters with rejected ballots',
+    button_type = 'primary',
+    has_icon = TRUE,
+    icon = 'fa fa-save',
+    csv2 = FALSE
+  )
 ```
