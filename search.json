@@ -4,7 +4,14 @@
     "href": "ballot_curing.html",
     "title": "Ballot curing",
     "section": "",
-    "text": "Download list of voters with rejected ballots"
+    "text": "This list is based on returns through 2025-10-31.\nDownload list of voters with rejected ballots"
+  },
+  {
+    "objectID": "ballot_curing.html#updates-to-forecasted-vote-share",
+    "href": "ballot_curing.html#updates-to-forecasted-vote-share",
+    "title": "Ballot curing",
+    "section": "Updates to forecasted vote share",
+    "text": "Updates to forecasted vote share\nThe forecasts predict Katie will win 52.0% of the vote. However, if we assume anyone who has had their ballot accepted has a probability of voting of 1, we now predict she will win 52.1% of the vote."
   },
   {
     "objectID": "index.html",
