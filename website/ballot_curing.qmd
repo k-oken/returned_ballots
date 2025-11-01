@@ -48,3 +48,31 @@ obs_returns |>
     csv2 = FALSE
   )
 ```
+
+
+```{r}
+
+forecasts <- obs_returns |>
+  right_join(select(
+    vote_forecast,
+    voter_id,
+    p_turnout_raw,
+    p_support_katie_hiercal,
+    support_flag_hiercal
+  )) |>
+  mutate(
+    to_sum = p_turnout_raw * p_support_katie_hiercal,
+    p_turnout_today = ifelse(
+      !is.na(ballot_status) & ballot_status == 'Accepted',
+      1,
+      p_turnout_raw
+    ),
+    to_sum_today = p_turnout_today * p_support_katie_hiercal
+  ) |>
+  summarise(
+    pct_wilson_pred = sum(to_sum) / sum(p_turnout_raw),
+    pct_wilson_update = sum(to_sum_today) / sum(p_turnout_today)
+  )
+```
+
+The forecasts predict Katie will win `r format(forecasts$pct_wilson_pred * 100, digits = 1, nsmall = 1)`% of the vote. However, if we assume anyone who has had their ballot accepted has a probability of voting of 1, we now predict she will win `r format(forecasts$pct_wilson_update * 100, digits = 1, nsmall = 1)`% of the vote.
