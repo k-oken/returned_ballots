@@ -2,7 +2,6 @@
 title: "Ballot curing"
 ---
 
-This list is based on returns through `r today`.
 ```{r}
 #| label: prep
 
@@ -23,6 +22,7 @@ i_am('website/index.qmd')
 load(here::here('cache/shared_objects.RData'))
 ```
 
+This list is based on returns through `r today`.
 
 ```{r}
 vote_forecast <- readr::read_csv(here('data/voter_forecast_2025_hiercal.csv'))
