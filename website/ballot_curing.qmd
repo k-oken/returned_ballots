@@ -35,9 +35,10 @@ obs_returns |>
     vote_forecast,
     voter_id,
     age = Age,
-    support_flag = support_flag_hiercal
+    support_flag = support_flag_hiercal,
+    p_support = p_support_katie_hiercal
   )) |>
-  filter(stringr::str_detect(support_flag, 'High')) |>
+  #   filter(stringr::str_detect(support_flag, 'High')) |>
   arrange(desc(received_date)) |>
   downloadthis::download_this(
     output_name = paste0('rejected_ballots_', today),
