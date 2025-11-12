@@ -26,6 +26,33 @@ This list is based on returns through `r today`.
 
 ```{r}
 vote_forecast <- readr::read_csv(here('data/voter_forecast_2025_hiercal.csv'))
+eday_precinct <- readr::read_csv(
+  'https://cdn.kingcounty.gov/-/media/king-county/depts/elections/results/2025/11/election-night-results-report.csv'
+) |>
+  rename_all(
+    ~ stringr::str_remove(
+      # remove the _ at the beginning
+      string = stringr::str_replace_all(., '[:upper:]', \(m) {
+        # add a _ before every capital letter
+        paste0("_", stringr::str_to_lower(m))
+      }),
+      '_'
+    )
+  ) |>
+  filter(race == 'City of Seattle Mayor') |>
+  mutate(
+    counter_type = stringr::str_to_lower(stringr::str_replace_all(
+      counter_type,
+      ' ',
+      '_'
+    ))
+  ) |>
+  tidyr::pivot_wider(names_from = counter_type, values_from = sum_of_count) |>
+  mutate(
+    eday_pct_wilson = katie_wilson /
+      (times_counted - times_under_voted - times_over_voted)
+  ) |>
+  select(precinct, eday_pct_wilson)
 
 obs_returns |>
   filter(ballot_status == 'Rejected', challenge_reason != 'Too Late') |>
@@ -38,8 +65,16 @@ obs_returns |>
     support_flag = support_flag_hiercal,
     p_support = p_support_katie_hiercal
   )) |>
-  #   filter(stringr::str_detect(support_flag, 'High')) |>
-  arrange(desc(received_date)) |>
+  left_join(eday_precinct) |>
+  mutate(
+    support_flag = ifelse(
+      (p_support < 0.75 | is.na(p_support)) & eday_pct_wilson > 0.6,
+      'High NEW',
+      support_flag
+    ),
+    support_flag = relevel(factor(support_flag), ref = 'High NEW')
+  ) |>
+  arrange(support_flag) |>
   downloadthis::download_this(
     output_name = paste0('rejected_ballots_', today),
     output_extension = '.csv',
@@ -51,32 +86,6 @@ obs_returns |>
   )
 ```
 
-
-```{r}
-
-forecasts <- obs_returns |>
-  right_join(select(
-    vote_forecast,
-    voter_id,
-    p_turnout_raw,
-    p_support_katie_hiercal,
-    support_flag_hiercal
-  )) |>
-  mutate(
-    to_sum = p_turnout_raw * p_support_katie_hiercal,
-    p_turnout_today = ifelse(
-      !is.na(ballot_status) & ballot_status == 'Accepted',
-      1,
-      p_turnout_raw
-    ),
-    to_sum_today = p_turnout_today * p_support_katie_hiercal
-  ) |>
-  summarise(
-    pct_wilson_pred = sum(to_sum) / sum(p_turnout_raw),
-    pct_wilson_update = sum(to_sum_today) / sum(p_turnout_today)
-  )
-```
-
 ```{r}
 forecasts <- obs_returns |>
   right_join(select(
@@ -88,24 +97,31 @@ forecasts <- obs_returns |>
   )) |>
   mutate(
     to_sum = p_turnout_raw * p_support_katie_hiercal,
-    p_turnout_today = ifelse(
+    p_turnout_pre_eday = ifelse(
       !is.na(ballot_status) &
         ballot_status == 'Accepted' &
         lubridate::ymd(received_date) < lubridate::ymd('2025-11-04'),
       1,
       0
     ),
-    to_sum_today = p_turnout_today * p_support_katie_hiercal,
-    p_turnout_binary = ifelse(
-      !is.na(ballot_status),
+    to_sum_pre_eday = p_turnout_pre_eday * p_support_katie_hiercal,
+    p_turnout_post_eday = ifelse(
+      !is.na(ballot_status) &
+        ballot_status == 'Accepted' &
+        lubridate::ymd(received_date) >= lubridate::ymd('2025-11-04'),
       1,
       0
     ),
-    to_sum_binary = p_turnout_binary * p_support_katie_hiercal
+    to_sum_post_eday = p_turnout_post_eday * p_support_katie_hiercal,
   ) |>
   summarise(
     pct_wilson_pred = sum(to_sum) / sum(p_turnout_raw),
-    pct_wilson_update = sum(to_sum_today) / sum(p_turnout_today),
-    pct_wilson_binary = sum(to_sum_binary) / sum(p_turnout_binary),
+    pct_wilson_wed = sum(to_sum_pre_eday) / sum(p_turnout_pre_eday),
+    pct_wilson_post_eday = sum(to_sum_post_eday) / sum(p_turnout_post_eday)
   )
+```
+
+
+```{r}
+
 ```
