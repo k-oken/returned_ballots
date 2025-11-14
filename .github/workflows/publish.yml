@@ -2,8 +2,8 @@ on:
   workflow_dispatch:
   push:
     branches: main
-  schedule:
-    - cron: '15 00 * * *' # daily at 21:15 UTC (5:15pm PDT)
+  # schedule:
+   # - cron: '15 00 * * *' # daily at 21:15 UTC (5:15pm PDT)
 
 name: Quarto Publish
 
